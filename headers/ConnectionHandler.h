@@ -1,26 +1,25 @@
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include "IConnectionHandler.h"
 
-template<typename T>
-class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<T>> {
+template<typename ConnectionClass>
+class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<ConnectionClass>>, public IConnectionHandler<ConnectionClass>{
     boost::asio::ip::tcp::socket socket_;
     boost::asio::io_service& service_;
     const size_t msgLength_{ 1024 };
     std::unique_ptr<boost::asio::streambuf> strBuf_;
     boost::asio::streambuf::mutable_buffers_type mutableBuffer_;
-    std::function <void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> readCallback_;
-    std::function <void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> writeCallback_;
-	T& caller_;
+    std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> readCallback_;
+    std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> writeCallback_;
+	ConnectionClass& caller_;
 public:
-    ConnectionHandler(boost::asio::io_service& service, T& caller);
+    ConnectionHandler(boost::asio::io_service& service, ConnectionClass& caller);
     ConnectionHandler(const ConnectionHandler& rhs) = delete;
-    void setReadCallback(std::function <void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> callback);
-    void setWriteCallback(std::function <void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> callback);
-    void callRead();
-    void callWrite(const std::string& str);
-    boost::asio::ip::tcp::socket& getSocket();
+    void setReadCallback(std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> callback) override;
+    void setWriteCallback(std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> callback) override;
+    void callRead() override;
+    void callWrite(const std::string& str) override;
+    boost::asio::ip::tcp::socket& getSocket() override;
     std::unique_ptr<boost::asio::streambuf>& getStrBuf();
     void setMutableBuffer();
 };
@@ -32,12 +31,12 @@ service_{ service }, strBuf_{ new boost::asio::streambuf }, mutableBuffer_{ strB
 
 }
 template<typename T>
-void ConnectionHandler<T>::setReadCallback(std::function<void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> callback)
+void ConnectionHandler<T>::setReadCallback(std::function<void(T* obj, std::shared_ptr<IConnectionHandler<T>>, const boost::system::error_code&, size_t)> callback)
 {
 	readCallback_ = callback;
 }
 template<typename T>
-void ConnectionHandler<T>::setWriteCallback(std::function<void(T* obj, std::shared_ptr<ConnectionHandler>, const boost::system::error_code&, size_t)> callback)
+void ConnectionHandler<T>::setWriteCallback(std::function<void(T* obj, std::shared_ptr<IConnectionHandler<T>>, const boost::system::error_code&, size_t)> callback)
 {
 	writeCallback_ = callback;
 }
