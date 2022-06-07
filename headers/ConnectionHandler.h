@@ -23,13 +23,7 @@ public:
     std::unique_ptr<boost::asio::streambuf>& getStrBuf();
     void setMutableBuffer();
 	ConnectionClass& getConnector() override;
-	boost::asio::io_service getIoService() override;
 };
-
-template<typename T>
-boost::asio::io_service ConnectionHandler<T>::getIoService() {
-	return service_;
-}
 
 template<typename T>
 ConnectionHandler<T>::ConnectionHandler(boost::asio::io_service& service, T& caller) : socket_{ service },
