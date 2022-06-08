@@ -22,6 +22,7 @@ public:
     boost::asio::ip::tcp::socket& getSocket() override;
     std::unique_ptr<boost::asio::streambuf>& getStrBuf();
     void setMutableBuffer();
+	ConnectionClass& getConnector() override;
 };
 
 template<typename T>
@@ -72,4 +73,10 @@ template<typename T>
 void ConnectionHandler<T>::setMutableBuffer()
 {
 	mutableBuffer_ = strBuf_->prepare(msgLength_);
+}
+
+template<typename ConnectionClass>
+ConnectionClass& ConnectionHandler<ConnectionClass>::getConnector()
+{
+	return caller_;
 }
