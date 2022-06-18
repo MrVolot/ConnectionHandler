@@ -15,6 +15,7 @@ class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<
 public:
     ConnectionHandler(boost::asio::io_service& service, ConnectionClass& caller);
     ConnectionHandler(const ConnectionHandler& rhs) = delete;
+	virtual ~ConnectionHandler();
     void setReadCallback(std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> callback) override;
     void setWriteCallback(std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> callback) override;
     void callRead() override;
@@ -31,6 +32,12 @@ service_{ service }, strBuf_{ new boost::asio::streambuf }, mutableBuffer_{ strB
 {
 
 }
+template<typename ConnectionClass>
+ConnectionHandler<ConnectionClass>::~ConnectionHandler()
+{
+
+}
+
 template<typename T>
 void ConnectionHandler<T>::setReadCallback(std::function<void(T* obj, std::shared_ptr<IConnectionHandler<T>>, const boost::system::error_code&, size_t)> callback)
 {
@@ -44,7 +51,7 @@ void ConnectionHandler<T>::setWriteCallback(std::function<void(T* obj, std::shar
 template<typename T>
 void ConnectionHandler<T>::callRead()
 {
-	socket_.async_read_some(boost::asio::buffer(mutableBuffer_), boost::bind(ConnectionHandler<T>::readCallback_,
+	socket_.async_receive(boost::asio::buffer(mutableBuffer_), boost::bind(ConnectionHandler<T>::readCallback_,
 		&caller_,
 		this->shared_from_this(),
 		boost::asio::placeholders::error,
