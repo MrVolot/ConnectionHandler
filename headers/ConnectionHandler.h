@@ -10,6 +10,7 @@ class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<
     std::unique_ptr<boost::asio::streambuf> strBuf_;
     boost::asio::streambuf::mutable_buffers_type mutableBuffer_;
     std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> readCallback_;
+	std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> notAsyncReadCallback_;
     std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> writeCallback_;
 	ConnectionClass& caller_;
 public:
@@ -24,6 +25,7 @@ public:
     std::unique_ptr<boost::asio::streambuf>& getStrBuf();
     void setMutableBuffer();
 	ConnectionClass& getConnector() override;
+	void callNotAsyncRead() override;
 };
 
 template<typename T>
@@ -86,4 +88,10 @@ template<typename ConnectionClass>
 ConnectionClass& ConnectionHandler<ConnectionClass>::getConnector()
 {
 	return caller_;
+}
+
+template<typename ConnectionClass>
+void ConnectionHandler<ConnectionClass>::callNotAsyncRead()
+{
+	socket_.read_some(boost::asio::buffer(mutableBuffer_));
 }
