@@ -22,7 +22,7 @@ public:
     void callAsyncRead() override;
     void callWrite(const std::string& str) override;
     boost::asio::ip::tcp::socket& getSocket() override;
-    std::unique_ptr<boost::asio::streambuf>& getStrBuf();
+    std::unique_ptr<boost::asio::streambuf>& getStrBuf() override;
     void setMutableBuffer();
 	ConnectionClass& getConnector() override;
 	void callRead() override;
