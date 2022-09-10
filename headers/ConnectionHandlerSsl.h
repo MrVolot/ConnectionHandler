@@ -30,7 +30,8 @@ public:
 	void setMutableBuffer() override;
 	ConnectionClass& getConnector() override;
 	void callRead() override;
-	bool serverHandShake();
+	void handShake();
+	bool verify_certificate(bool preverified, boost::asio::ssl::verify_context& ctx);
 };
 
 template<typename T>
@@ -43,14 +44,9 @@ ConnectionHandlerSsl<T>::ConnectionHandlerSsl(boost::asio::io_service& service, 
 	mutableBuffer_{ strBuf_->prepare(msgLength_) },
 	caller_{ caller }
 {
-	context_.set_options(
-		boost::asio::ssl::context::default_workarounds
-		| boost::asio::ssl::context::no_sslv2
-		| boost::asio::ssl::context::single_dh_use);
-	context_.set_password_callback(std::bind(&ConnectionHandlerSsl<T>::getPassword, this));
-	context_.use_certificate_chain_file("cert.pem");
-	context_.use_private_key_file("key.pem", boost::asio::ssl::context::pem);
-	context_.use_tmp_dh_file("dhparams.pem");
+	socket_.set_verify_mode(boost::asio::ssl::verify_peer);
+	socket_.set_verify_callback(
+		std::bind(&ConnectionHandlerSsl::verify_certificate, this, std::placeholders::_1, std::placeholders::_2));
 }
 template<typename ConnectionClass>
 std::string ConnectionHandlerSsl<ConnectionClass>::getPassword()
@@ -120,16 +116,20 @@ void ConnectionHandlerSsl<ConnectionClass>::callRead()
 }
 
 template<typename ConnectionClass>
-bool ConnectionHandlerSsl<ConnectionClass>::serverHandShake()
+void ConnectionHandlerSsl<ConnectionClass>::handShake()
 {
-	socket_.async_handshake(boost::asio::ssl::stream_base::server,
-		[](const boost::system::error_code& error)
+	socket_.async_handshake(boost::asio::ssl::stream_base::client,
+		[this](const boost::system::error_code& error)
 		{
-			if (!error)
-			{
-				return true;
-			}
-			return false;
 		});
-	return true;
+}
+
+template<typename ConnectionClass>
+bool ConnectionHandlerSsl<ConnectionClass>::verify_certificate(bool preverified, boost::asio::ssl::verify_context& ctx)
+{
+	char subject_name[256];
+	X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
+	X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
+
+	return preverified;
 }
