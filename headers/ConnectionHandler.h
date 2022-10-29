@@ -37,7 +37,7 @@ service_{ service }, strBuf_{ new boost::asio::streambuf }, mutableBuffer_{ strB
 template<typename ConnectionClass>
 ConnectionHandler<ConnectionClass>::~ConnectionHandler()
 {
-
+	socket_.close();
 }
 
 template<typename T>
