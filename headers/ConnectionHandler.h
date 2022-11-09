@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IConnectionHandler.h"
-
+//
 template<typename ConnectionClass>
 class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<ConnectionClass>>, public IConnectionHandler<ConnectionClass>{
     boost::asio::ip::tcp::socket socket_;
