@@ -13,7 +13,7 @@ public:
 	virtual void callWrite(const std::string& str) = 0;
 	virtual boost::asio::ip::tcp::socket& getSocket() = 0;
 	virtual std::unique_ptr<boost::asio::streambuf>& getStrBuf() = 0;
-	virtual void setMutableBuffer() = 0;
+	virtual void resetStrBuf() = 0;
 	virtual ConnectionClass& getConnector() = 0;
 	virtual std::string getData() = 0;
 };

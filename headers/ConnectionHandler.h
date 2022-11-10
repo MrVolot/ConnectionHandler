@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IConnectionHandler.h"
-//
+
 template<typename ConnectionClass>
 class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<ConnectionClass>>, public IConnectionHandler<ConnectionClass>{
     boost::asio::ip::tcp::socket socket_;
@@ -23,7 +23,7 @@ public:
     void callWrite(const std::string& str) override;
     boost::asio::ip::tcp::socket& getSocket() override;
     std::unique_ptr<boost::asio::streambuf>& getStrBuf() override;
-    void setMutableBuffer();
+    void resetStrBuf();
 	ConnectionClass& getConnector() override;
 	void callRead() override;
 	std::string getData();
@@ -82,9 +82,9 @@ std::unique_ptr<boost::asio::streambuf>& ConnectionHandler<T>::getStrBuf()
 	return strBuf_;
 }
 template<typename T>
-void ConnectionHandler<T>::setMutableBuffer()
+void ConnectionHandler<T>::resetStrBuf()
 {
-	//mutableBuffer_ = strBuf_->prepare(msgLength_);
+	strBuf_.reset(new boost::asio::streambuf);
 }
 
 template<typename ConnectionClass>
