@@ -15,4 +15,5 @@ public:
 	virtual std::unique_ptr<boost::asio::streambuf>& getStrBuf() = 0;
 	virtual void setMutableBuffer() = 0;
 	virtual ConnectionClass& getConnector() = 0;
+	virtual std::string getData() = 0;
 };

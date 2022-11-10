@@ -7,7 +7,7 @@ class ConnectionHandler : public std::enable_shared_from_this<ConnectionHandler<
     boost::asio::ip::tcp::socket socket_;
     boost::asio::io_service& service_;
     const size_t msgLength_{ 1024 };
-    std::unique_ptr<boost::asio::streambuf> strBuf_;
+	std::unique_ptr<boost::asio::streambuf> strBuf_; 
     std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> readCallback_;
     std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> asyncReadCallback_;
     std::function <void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> writeCallback_;
@@ -26,6 +26,7 @@ public:
     void setMutableBuffer();
 	ConnectionClass& getConnector() override;
 	void callRead() override;
+	std::string getData();
 };
 
 template<typename T>
@@ -96,4 +97,10 @@ template<typename ConnectionClass>
 void ConnectionHandler<ConnectionClass>::callRead()
 {
 	//socket_.read_some(boost::asio::buffer(mutableBuffer_));
+}
+
+template<typename ConnectionClass>
+std::string ConnectionHandler<ConnectionClass>::getData() {
+	std::string data{ boost::asio::buffer_cast<const char*> (strBuf_->data()) };
+	return data.substr(0, data.length() - strlen(delimiter));
 }
