@@ -151,7 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="headers\ConnectionHandlerSsl.h" />
+    <ClInclude Include="headers\ConnectionHandler.h" />
+    <ClInclude Include="headers\HttpsConnectionHandler.h" />
     <ClInclude Include="headers\IConnectionHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
