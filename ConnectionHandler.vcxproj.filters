@@ -18,7 +18,10 @@
     <ClInclude Include="headers\IConnectionHandler.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="headers\ConnectionHandlerSsl.h">
+    <ClInclude Include="headers\HttpsConnectionHandler.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\ConnectionHandler.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

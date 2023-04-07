@@ -16,4 +16,5 @@ public:
 	virtual void resetStrBuf() = 0;
 	virtual ConnectionClass& getConnector() = 0;
 	virtual std::string getData() = 0;
+	virtual void callAsyncHandshake() = 0;
 };
