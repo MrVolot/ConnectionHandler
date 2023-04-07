@@ -27,6 +27,8 @@ public:
 	ConnectionClass& getConnector() override;
 	void callRead() override;
 	std::string getData();
+    void callAsyncHandshake() override {};
+    void flushStream() override{};
 };
 
 template<typename T>
