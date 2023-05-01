@@ -22,7 +22,7 @@ class HttpsConnectionHandler : public std::enable_shared_from_this<HttpsConnecti
     std::function<void(ConnectionClass* obj, std::shared_ptr<IConnectionHandler<ConnectionClass>>, const boost::system::error_code&, size_t)> writeCallback_;
     ConnectionClass& caller_;
     static constexpr auto delimiter{ "\r\n\r\n" };
-
+    std::string str_to_send_;
 public:
     HttpsConnectionHandler(boost::asio::io_service& service, ConnectionClass& caller, boost::asio::ssl::context& ssl_context);
     virtual ~HttpsConnectionHandler();
@@ -71,9 +71,10 @@ void HttpsConnectionHandler<ConnectionClass, type>::callRead() {
 
 template <typename ConnectionClass, ConnectionHandlerType type>
 void HttpsConnectionHandler<ConnectionClass, type>::callWrite(const std::string& str) {
-    std::string strToSend{ str };
-    strToSend.append(delimiter);
-    boost::asio::async_write(socket_, boost::asio::buffer(strToSend.c_str(), strToSend.size()), boost::bind(writeCallback_, &caller_, this->shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+    str_to_send_ = str;
+    str_to_send_.append(delimiter);
+    boost::asio::async_write(socket_, boost::asio::buffer(str_to_send_.c_str(), str_to_send_.size()), boost::bind(writeCallback_, &caller_, this->shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+    //Add clean logic in writeCallbacks
 }
 
 template <typename ConnectionClass, ConnectionHandlerType type>
